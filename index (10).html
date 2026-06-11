@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>JLF — Pure Water · Reinvent hydration</title>
+<meta name="description" content="JLF Pure Water — l'eau premium, élevée au rang d'objet. Reinvent hydration."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Manrope:wght@200;300;400;500;600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+/* ════════════════════════════════════════════════════════════
+   JLF — PURE WATER · « Studio de packshot virtuel »
+   Noir d'encre, blanc porcelaine, argent, bleu glacier.
+   Display : Marcellus · Corps : Manrope · Micro : JetBrains Mono
+════════════════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#04060A;
+  --ink2:#080C12;
+  --white:#F5F7FA;
+  --white2:rgba(245,247,250,.66);
+  --white3:rgba(245,247,250,.34);
+  --silver:#C9D1DA;
+  --blue:#9FD8F2;
+  --blue2:#5FB6DC;
+  --hair:rgba(245,247,250,.08);
+  --glass:rgba(245,247,250,.04);
+  --fd:'Marcellus',serif;
+  --fb:'Manrope',sans-serif;
+  --fm:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth}
+html,body{background:var(--ink);color:var(--white);font-family:var(--fb);-webkit-font-smoothing:antialiased}
+body{overflow-x:hidden}
+::selection{background:rgba(159,216,242,.25)}
+
+/* ── Canvas 3D (fond fixe) ── */
+#stage{position:fixed;inset:0;z-index:0}
+#stage canvas{display:block;width:100%;height:100%}
+
+/* ── Curseur ── */
+#cur{position:fixed;top:0;left:0;width:6px;height:6px;border-radius:50%;background:var(--blue);box-shadow:0 0 10px var(--blue);z-index:9000;pointer-events:none;transform:translate(-50%,-50%)}
+#curR{position:fixed;top:0;left:0;width:36px;height:36px;border-radius:50%;border:1px solid rgba(159,216,242,.4);z-index:9000;pointer-events:none;transform:translate(-50%,-50%);transition:width .25s,height .25s,background .25s,border-color .25s}
+#curR.big{width:70px;height:70px;background:rgba(159,216,242,.06);border-color:var(--blue)}
+@media(hover:none){#cur,#curR{display:none}}
+
+/* ── Loader ── */
+#loader{position:fixed;inset:0;z-index:8000;background:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2.4rem;transition:opacity .9s ease}
+#loader.done{opacity:0;pointer-events:none}
+.ld-mark{font-family:var(--fd);font-size:clamp(3.4rem,9vw,6rem);letter-spacing:.34em;padding-left:.34em;background:linear-gradient(120deg,var(--white) 30%,var(--blue) 50%,var(--white) 70%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:sheen 2.6s ease infinite}
+@keyframes sheen{0%{background-position:120% 0}100%{background-position:-120% 0}}
+.ld-line{width:min(300px,60vw);height:1px;background:var(--hair);position:relative;overflow:hidden}
+.ld-fill{position:absolute;inset:0;width:0;background:linear-gradient(90deg,var(--blue2),var(--blue),var(--white));box-shadow:0 0 14px rgba(159,216,242,.6)}
+.ld-pct{font-family:var(--fm);font-size:.6rem;letter-spacing:.4em;color:var(--white3)}
+
+/* ── Nav ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:700;display:flex;align-items:center;justify-content:space-between;padding:1.7rem clamp(1.4rem,4vw,3.4rem);transition:background .5s,backdrop-filter .5s,border-color .5s;border-bottom:1px solid transparent}
+nav.scrolled{background:rgba(4,6,10,.55);backdrop-filter:blur(18px);border-bottom-color:var(--hair)}
+.brand{font-family:var(--fd);font-size:1.15rem;letter-spacing:.42em;padding-left:.42em;text-decoration:none;color:var(--white)}
+.menu{display:flex;gap:2.6rem;list-style:none}
+.menu a{font-family:var(--fm);font-size:.58rem;letter-spacing:.3em;text-transform:uppercase;color:var(--white3);text-decoration:none;position:relative;padding:.4rem 0;transition:color .3s}
+.menu a::after{content:"";position:absolute;left:0;bottom:0;width:100%;height:1px;background:var(--blue);transform:scaleX(0);transform-origin:right;transition:transform .4s cubic-bezier(.16,1,.3,1)}
+.menu a:hover{color:var(--white)}
+.menu a:hover::after{transform:scaleX(1);transform-origin:left}
+.nav-cta{font-family:var(--fm);font-size:.56rem;letter-spacing:.28em;text-transform:uppercase;color:var(--ink);background:var(--white);text-decoration:none;padding:.75rem 1.5rem;border-radius:99px;transition:background .3s,box-shadow .3s,transform .2s}
+.nav-cta:hover{background:var(--blue);box-shadow:0 0 30px rgba(159,216,242,.35);transform:translateY(-1px)}
+@media(max-width:760px){.menu{display:none}}
+
+/* ── Sections / mise en page ── */
+main{position:relative;z-index:10}
+section{min-height:100vh;display:flex;align-items:center;padding:7rem clamp(1.4rem,5vw,4rem)}
+.inner{width:100%;max-width:1240px;margin:0 auto}
+.eyebrow{font-family:var(--fm);font-size:.58rem;letter-spacing:.42em;text-transform:uppercase;color:var(--blue);display:flex;align-items:center;gap:1rem;margin-bottom:1.6rem}
+.eyebrow::before{content:"";width:34px;height:1px;background:linear-gradient(90deg,var(--blue),transparent)}
+h1,h2{font-family:var(--fd);font-weight:400;line-height:1.06;letter-spacing:.02em}
+.lead{font-weight:300;font-size:1rem;line-height:2;color:var(--white2);max-width:46ch}
+.lead strong{font-weight:600;color:var(--white)}
+
+/* révélations au scroll */
+.rv{opacity:0;transform:translateY(34px);transition:opacity 1s cubic-bezier(.16,1,.3,1),transform 1s cubic-bezier(.16,1,.3,1)}
+.rv.in{opacity:1;transform:none}
+.rv.d1{transition-delay:.08s}.rv.d2{transition-delay:.18s}.rv.d3{transition-delay:.3s}.rv.d4{transition-delay:.44s}
+
+/* ── HERO ── */
+#hero{flex-direction:column;justify-content:center;text-align:center;position:relative}
+.hero-kicker{font-family:var(--fm);font-size:.6rem;letter-spacing:.5em;text-transform:uppercase;color:var(--white3);margin-bottom:2rem}
+.hero-kicker b{color:var(--blue);font-weight:400}
+.hero-title{font-size:clamp(3rem,11vw,8.6rem);letter-spacing:.16em;padding-left:.16em}
+.hero-title .pure{display:block;font-size:clamp(1.1rem,3.4vw,2.4rem);letter-spacing:.85em;padding-left:.85em;color:var(--silver);margin-top:1rem}
+.hero-tag{margin-top:2.4rem;font-weight:200;font-size:clamp(.95rem,2vw,1.3rem);letter-spacing:.34em;text-transform:uppercase;color:var(--white2)}
+.hero-tag em{font-style:normal;color:var(--blue)}
+.hero-ctas{margin-top:3.4rem;display:flex;gap:1.2rem;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:.9rem;padding:1.05rem 2.4rem;border-radius:99px;text-decoration:none;font-family:var(--fm);font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;transition:transform .25s,box-shadow .25s,background .25s,color .25s,border-color .25s}
+.btn.solid{background:var(--white);color:var(--ink)}
+.btn.solid:hover{background:var(--blue);box-shadow:0 0 44px rgba(159,216,242,.4);transform:translateY(-2px)}
+.btn.line{border:1px solid rgba(245,247,250,.22);color:var(--white2);backdrop-filter:blur(8px)}
+.btn.line:hover{border-color:var(--blue);color:var(--white);box-shadow:0 0 30px rgba(159,216,242,.18);transform:translateY(-2px)}
+.scroll-cue{position:absolute;bottom:2.4rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.8rem;font-family:var(--fm);font-size:.52rem;letter-spacing:.42em;text-transform:uppercase;color:var(--white3)}
+.scroll-cue i{width:1px;height:52px;background:linear-gradient(to bottom,var(--blue),transparent);display:block;animation:cue 2s ease infinite;transform-origin:top}
+@keyframes cue{0%{transform:scaleY(0)}45%{transform:scaleY(1)}100%{transform:scaleY(1);opacity:0}}
+
+/* ── Sections produit (texte latéral, bouteille au centre) ── */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+.split.right{grid-template-columns:1fr 1fr}
+.split .void{min-height:50vh} /* espace réservé à la bouteille 3D */
+.glass-card{background:var(--glass);border:1px solid var(--hair);backdrop-filter:blur(20px);border-radius:18px;padding:1.8rem 2rem;transition:border-color .35s,background .35s,transform .35s,box-shadow .35s}
+.glass-card:hover{border-color:rgba(159,216,242,.35);background:rgba(159,216,242,.05);transform:translateY(-4px);box-shadow:0 24px 60px rgba(0,0,0,.45),0 0 40px rgba(159,216,242,.07)}
+.gc-k{font-family:var(--fm);font-size:.52rem;letter-spacing:.3em;text-transform:uppercase;color:var(--blue);margin-bottom:.6rem}
+.gc-v{font-family:var(--fd);font-size:1.7rem;color:var(--white)}
+.gc-d{font-size:.78rem;font-weight:300;color:var(--white3);margin-top:.45rem;line-height:1.7}
+.spec-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem;margin-top:2.6rem}
+@media(max-width:980px){.split,.split.right{grid-template-columns:1fr}.split .void{min-height:46vh;order:-1}.spec-row{grid-template-columns:1fr}}
+
+h2{font-size:clamp(2rem,5vw,3.6rem)}
+h2 .thin{display:block;color:var(--silver);font-size:.55em;letter-spacing:.3em;margin-top:.6rem}
+
+/* listing détails (close-up) */
+.detail{display:flex;gap:1.4rem;padding:1.4rem 0;border-bottom:1px solid var(--hair);transition:padding-left .35s}
+.detail:first-of-type{border-top:1px solid var(--hair)}
+.detail:hover{padding-left:.8rem}
+.d-n{font-family:var(--fd);font-size:1rem;color:var(--blue);min-width:2.4rem}
+.d-t{font-size:.92rem;font-weight:500;letter-spacing:.04em;margin-bottom:.3rem}
+.d-d{font-size:.78rem;font-weight:300;color:var(--white3);line-height:1.75}
+
+/* ── Collection ── */
+#collection .inner{text-align:center}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;margin-top:3.4rem;text-align:left}
+.p-card{position:relative;border-radius:22px;padding:2.4rem 2.1rem;background:var(--glass);border:1px solid var(--hair);backdrop-filter:blur(22px);overflow:hidden;transition:transform .4s cubic-bezier(.16,1,.3,1),border-color .4s,box-shadow .4s}
+.p-card::before{content:"";position:absolute;top:0;left:-60%;width:50%;height:100%;background:linear-gradient(100deg,transparent,rgba(245,247,250,.07),transparent);transform:skewX(-18deg);transition:left .7s ease}
+.p-card:hover{transform:translateY(-8px);border-color:rgba(159,216,242,.4);box-shadow:0 30px 70px rgba(0,0,0,.5),0 0 50px rgba(159,216,242,.08)}
+.p-card:hover::before{left:120%}
+.p-card.hero-card{border-color:rgba(159,216,242,.35);background:linear-gradient(160deg,rgba(159,216,242,.08),rgba(245,247,250,.03))}
+.pc-tag{font-family:var(--fm);font-size:.5rem;letter-spacing:.3em;text-transform:uppercase;color:var(--blue);border:1px solid rgba(159,216,242,.3);border-radius:99px;padding:.35rem .9rem;display:inline-block;margin-bottom:1.4rem}
+.pc-name{font-family:var(--fd);font-size:1.6rem;margin-bottom:.4rem}
+.pc-sub{font-size:.75rem;font-weight:300;color:var(--white3);line-height:1.8;min-height:3.4em}
+.pc-price{font-family:var(--fd);font-size:2.3rem;margin:1.6rem 0 .2rem;color:var(--white)}
+.pc-price small{font-family:var(--fm);font-size:.55rem;letter-spacing:.2em;color:var(--white3);margin-left:.5rem}
+.pc-list{list-style:none;margin:1.4rem 0 1.8rem;display:flex;flex-direction:column;gap:.65rem}
+.pc-list li{font-size:.76rem;font-weight:300;color:var(--white2);display:flex;gap:.7rem;align-items:baseline}
+.pc-list li::before{content:"";width:14px;height:1px;background:var(--blue);flex-shrink:0;transform:translateY(-3px)}
+.pc-btn{display:block;text-align:center;padding:.95rem;border-radius:99px;text-decoration:none;font-family:var(--fm);font-size:.58rem;letter-spacing:.3em;text-transform:uppercase;border:1px solid rgba(245,247,250,.22);color:var(--white2);transition:all .3s}
+.pc-btn:hover{background:var(--white);color:var(--ink);border-color:var(--white)}
+.hero-card .pc-btn{background:var(--white);color:var(--ink);border-color:var(--white)}
+.hero-card .pc-btn:hover{background:var(--blue);box-shadow:0 0 34px rgba(159,216,242,.4)}
+@media(max-width:980px){.cards{grid-template-columns:1fr}}
+
+/* ── Manifesto bandeau ── */
+#manifesto{min-height:70vh;text-align:center}
+.mani{font-family:var(--fd);font-size:clamp(1.5rem,4vw,2.9rem);line-height:1.5;max-width:21ch;margin:0 auto;color:var(--white)}
+.mani em{font-style:normal;color:var(--blue)}
+
+/* ── Footer ── */
+footer{position:relative;z-index:10;border-top:1px solid var(--hair);background:rgba(4,6,10,.72);backdrop-filter:blur(20px);padding:4.5rem clamp(1.4rem,5vw,4rem) 2.5rem}
+.f-grid{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:3rem}
+.f-brand{font-family:var(--fd);font-size:2rem;letter-spacing:.4em}
+.f-tag{font-size:.8rem;font-weight:300;color:var(--white3);margin-top:1rem;line-height:1.9;max-width:30ch}
+.f-h{font-family:var(--fm);font-size:.55rem;letter-spacing:.34em;text-transform:uppercase;color:var(--blue);margin-bottom:1.2rem}
+.f-l{display:flex;flex-direction:column;gap:.7rem}
+.f-l a{font-size:.8rem;font-weight:300;color:var(--white2);text-decoration:none;transition:color .25s,letter-spacing .25s}
+.f-l a:hover{color:var(--blue);letter-spacing:.04em}
+.f-base{max-width:1240px;margin:3.4rem auto 0;padding-top:1.6rem;border-top:1px solid var(--hair);display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;font-family:var(--fm);font-size:.52rem;letter-spacing:.26em;text-transform:uppercase;color:var(--white3)}
+@media(max-width:860px){.f-grid{grid-template-columns:1fr}}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001s !important;transition-duration:.001s !important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<div id="stage"></div>
+<div id="curR"></div><div id="cur"></div>
+
+<!-- ════ LOADER ════ -->
+<div id="loader">
+  <div class="ld-mark">JLF</div>
+  <div class="ld-line"><div class="ld-fill" id="ldFill"></div></div>
+  <div class="ld-pct" id="ldPct">PURE WATER · 0%</div>
+</div>
+
+<!-- ════ NAV ════ -->
+<nav id="nav">
+  <a class="brand" href="#hero">JLF</a>
+  <ul class="menu">
+    <li><a href="#purete">Pureté</a></li>
+    <li><a href="#lumiere">Lumière</a></li>
+    <li><a href="#detail">Détail</a></li>
+    <li><a href="#collection">Collection</a></li>
+  </ul>
+  <a class="nav-cta" href="#collection">Réserver</a>
+</nav>
+
+<main>
+
+<!-- ════ HERO ════ -->
+<section id="hero">
+  <div class="hero-kicker rv">JUSTE L'EAU FRAICHE · <b>MAISON D'EAU</b> · DEPUIS 2025</div>
+  <h1 class="hero-title rv d1">JLF<span class="pure">PURE WATER</span></h1>
+  <div class="hero-tag rv d2">— Reinvent <em>hydration</em> —</div>
+  <div class="hero-ctas rv d3">
+    <a class="btn solid" href="#collection">Découvrir la collection</a>
+    <a class="btn line" href="#purete">L'objet en lumière</a>
+  </div>
+  <div class="scroll-cue"><span>Scroll</span><i></i></div>
+</section>
+
+<!-- ════ 01 — FLOATING ════ -->
+<section id="purete">
+  <div class="inner split">
+    <div>
+      <div class="eyebrow rv">01 — En apesanteur</div>
+      <h2 class="rv d1">La pureté,<br>suspendue.<span class="thin">FLOATING EDITION</span></h2>
+      <p class="lead rv d2" style="margin-top:1.6rem">Chaque bouteille <strong>JLF</strong> est pensée comme un objet : un verre épais, une silhouette droite, une eau d'une <strong>clarté absolue</strong>. Rien à cacher, rien à ajouter — seulement l'essentiel, en suspension.</p>
+      <div class="spec-row rv d3">
+        <div class="glass-card"><div class="gc-k">Équilibre</div><div class="gc-v">pH 7,2</div><div class="gc-d">Neutralité parfaite, bouche soyeuse.</div></div>
+        <div class="glass-card"><div class="gc-k">Minéralité</div><div class="gc-v">faible</div><div class="gc-d">Résidu sec maîtrisé, finale nette.</div></div>
+        <div class="glass-card"><div class="gc-k">Service</div><div class="gc-v">8–10°C</div><div class="gc-d">Température idéale de dégustation.</div></div>
+      </div>
+    </div>
+    <div class="void" aria-hidden="true"></div>
+  </div>
+</section>
+
+<!-- ════ 02 — LUMIÈRE ════ -->
+<section id="lumiere">
+  <div class="inner split right">
+    <div class="void" aria-hidden="true"></div>
+    <div>
+      <div class="eyebrow rv">02 — Studio de lumière</div>
+      <h2 class="rv d1">La lumière<br>comme matière.<span class="thin">LIGHT &amp; REFLECTIONS</span></h2>
+      <p class="lead rv d2" style="margin-top:1.6rem">Le verre <strong>JLF</strong> capte la lumière comme un cristal : reflets étirés, réfractions bleutées, profondeur liquide. Un éclairage de studio — <strong>en temps réel</strong> — sculpte l'objet sous vos yeux.</p>
+      <div class="spec-row rv d3">
+        <div class="glass-card"><div class="gc-k">Matière</div><div class="gc-v">Verre</div><div class="gc-d">Haute transparence, teinte glacier.</div></div>
+        <div class="glass-card"><div class="gc-k">Indice</div><div class="gc-v">1,45</div><div class="gc-d">Réfraction réelle du verre, simulée.</div></div>
+        <div class="glass-card"><div class="gc-k">Finition</div><div class="gc-v">Polie</div><div class="gc-d">Surface miroir, reflets continus.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ 03 — DÉTAIL ════ -->
+<section id="detail">
+  <div class="inner split">
+    <div>
+      <div class="eyebrow rv">03 — Plan rapproché</div>
+      <h2 class="rv d1">Le détail,<br>au millimètre.<span class="thin">CLOSE-UP</span></h2>
+      <div style="margin-top:2.2rem" class="rv d2">
+        <div class="detail"><div class="d-n">I</div><div><div class="d-t">Capsule argent brossé</div><div class="d-d">Usinée d'une seule pièce, fermeture à couple constant, toucher froid du métal.</div></div></div>
+        <div class="detail"><div class="d-n">II</div><div><div class="d-t">Col étiré</div><div class="d-d">Un col fin pour un service précis, sans goutte, inspiré des flaconnages de parfumerie.</div></div></div>
+        <div class="detail"><div class="d-n">III</div><div><div class="d-t">Monogramme gravé</div><div class="d-d">Le sceau JLF, gravé dans la masse du verre — discret de face, révélé par la lumière.</div></div></div>
+        <div class="detail"><div class="d-n">IV</div><div><div class="d-t">Assise lestée</div><div class="d-d">Un fond épais qui ancre la bouteille sur la table. La stabilité comme signature.</div></div></div>
+      </div>
+    </div>
+    <div class="void" aria-hidden="true"></div>
+  </div>
+</section>
+
+<!-- ════ MANIFESTO ════ -->
+<section id="manifesto">
+  <div class="inner">
+    <div class="eyebrow rv" style="justify-content:center">Manifeste</div>
+    <p class="mani rv d1">« Tout le monde mérite une eau de qualité, <em>sans effort</em>. Nous livrons la pureté à votre porte. »</p>
+  </div>
+</section>
+
+<!-- ════ COLLECTION ════ -->
+<section id="collection">
+  <div class="inner">
+    <div class="eyebrow rv" style="justify-content:center">04 — La collection</div>
+    <h2 class="rv d1">Trois façons de<br>recevoir la pureté.</h2>
+    <div class="cards">
+      <div class="p-card rv d1">
+        <div class="pc-tag">Signature</div>
+        <div class="pc-name">JLF 75 cl</div>
+        <p class="pc-sub">La bouteille iconique en verre glacier, capsule argent. L'objet du quotidien, élevé.</p>
+        <div class="pc-price">12 €<small>/ BOUTEILLE</small></div>
+        <ul class="pc-list">
+          <li>Verre haute transparence</li>
+          <li>Capsule argent brossé</li>
+          <li>Coffret de présentation</li>
+        </ul>
+        <a class="pc-btn" href="mailto:thibault.fatela@gmail.com?subject=JLF%20Signature">Réserver</a>
+      </div>
+      <div class="p-card hero-card rv d2">
+        <div class="pc-tag">Édition limitée</div>
+        <div class="pc-name">Givrée — Magnum</div>
+        <p class="pc-sub">1,5 L de pureté en verre givré, numérotée à la main. La pièce de collection JLF.</p>
+        <div class="pc-price">95 €<small>/ MAGNUM</small></div>
+        <ul class="pc-list">
+          <li>Verre givré, série numérotée</li>
+          <li>Gravure du monogramme</li>
+          <li>Écrin noir, livraison gantée</li>
+        </ul>
+        <a class="pc-btn" href="mailto:thibault.fatela@gmail.com?subject=JLF%20Magnum%20Givr%C3%A9">Réserver l'édition</a>
+      </div>
+      <div class="p-card rv d3">
+        <div class="pc-tag">Abonnement</div>
+        <div class="pc-name">La Source</div>
+        <p class="pc-sub">Votre cave d'eau, réapprovisionnée chaque semaine. Sans commande, sans rupture.</p>
+        <div class="pc-price">59 €<small>/ MOIS</small></div>
+        <ul class="pc-list">
+          <li>12 bouteilles Signature / mois</li>
+          <li>Livraison à domicile incluse</li>
+          <li>Conciergerie dédiée</li>
+        </ul>
+        <a class="pc-btn" href="mailto:thibault.fatela@gmail.com?subject=JLF%20La%20Source">S'abonner</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ════ FOOTER ════ -->
+<footer>
+  <div class="f-grid">
+    <div>
+      <div class="f-brand">JLF</div>
+      <p class="f-tag">Juste L'eau Fraiche — maison d'eau premium. La pureté, livrée chez vous.</p>
+    </div>
+    <div>
+      <div class="f-h">Maison</div>
+      <div class="f-l">
+        <a href="#purete">La pureté</a>
+        <a href="#lumiere">La lumière</a>
+        <a href="#detail">Le détail</a>
+        <a href="#collection">La collection</a>
+      </div>
+    </div>
+    <div>
+      <div class="f-h">Contact</div>
+      <div class="f-l">
+        <a href="mailto:thibault.fatela@gmail.com">thibault.fatela@gmail.com</a>
+        <a href="https://github.com/wspngg" target="_blank" rel="noopener">github.com/wspngg</a>
+        <a href="https://linkedin.com/in/thibault-fatela" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
+    </div>
+  </div>
+  <div class="f-base">
+    <span>© 2026 JLF — Juste L'eau Fraiche</span>
+    <span>Reinvent Hydration</span>
+  </div>
+</footer>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   SCÈNE 3D — Packshot studio temps réel
+   Bouteille en verre procédurale · éclairage HDRI simulé (softboxes)
+   · bulles · caméra cinématique pilotée par le scroll
+════════════════════════════════════════════════════════════ */
+(function(){
+  const mount = document.getElementById('stage');
+  const renderer = new THREE.WebGLRenderer({antialias:true, alpha:false});
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.15;
+  mount.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(38, innerWidth/innerHeight, .1, 100);
+
+  /* ── Fond : dégradé studio (sphère inversée) ── */
+  const bgGeo = new THREE.SphereGeometry(50, 32, 32);
+  const bgMat = new THREE.ShaderMaterial({
+    side: THREE.BackSide, depthWrite:false,
+    uniforms:{ top:{value:new THREE.Color('#0A1018')}, mid:{value:new THREE.Color('#04060A')}, glow:{value:new THREE.Color('#0E1B26')} },
+    vertexShader:`varying vec3 vP; void main(){ vP=normalize(position); gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+    fragmentShader:`varying vec3 vP; uniform vec3 top,mid,glow;
+      void main(){
+        float h = vP.y*.5+.5;
+        vec3 c = mix(mid, top, smoothstep(.25,.95,h));
+        float halo = exp(-pow(length(vP.xy - vec2(0.,-.05))*2.6, 2.));
+        c += glow * halo * .9;
+        gl_FragColor = vec4(c,1.);
+      }`
+  });
+  scene.add(new THREE.Mesh(bgGeo, bgMat));
+
+  /* ── Environnement HDRI simulé : softboxes dans une scène PMREM ── */
+  function makeEnv(){
+    const env = new THREE.Scene();
+    env.add(new THREE.Mesh(new THREE.SphereGeometry(20,16,16),
+      new THREE.MeshBasicMaterial({color:0x0a0f16, side:THREE.BackSide})));
+    function box(w,h,color,intensity,pos,lookAt){
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(w,h),
+        new THREE.MeshBasicMaterial({color:new THREE.Color(color).multiplyScalar(intensity)}));
+      m.position.copy(pos); m.lookAt(lookAt||new THREE.Vector3(0,0,0)); env.add(m);
+    }
+    box(2, 14, '#FFFFFF', 9,  new THREE.Vector3(-7, 2,  3));   // key strip gauche
+    box(2, 14, '#CFE9F7', 7,  new THREE.Vector3( 7, 1,  2));   // rim bleuté droite
+    box(10, 2, '#FFFFFF', 5,  new THREE.Vector3( 0, 9,  0));   // plafonnier
+    box(1.2,10,'#9FD8F2', 6,  new THREE.Vector3( 0, 0, -8));   // contre bleu glacier
+    box(6, 1,  '#FFE9D2', 1.6,new THREE.Vector3( 0,-7,  4));   // rebond chaud léger
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    const envMap = pmrem.fromScene(env, .035).texture;
+    pmrem.dispose();
+    return envMap;
+  }
+  const envMap = makeEnv();
+  scene.environment = envMap;
+
+  /* ── Groupe bouteille ── */
+  const bottle = new THREE.Group();
+  scene.add(bottle);
+
+  // Profil de la bouteille (lathe) — silhouette droite, épaule douce, col fin
+  function profile(scaleR=1){
+    const p = [];
+    const pts = [
+      [0.00, 0.00],[0.55, 0.00],[0.62, 0.04],[0.64, 0.12],   // assise lestée
+      [0.64, 2.55],                                          // fût
+      [0.60, 2.85],[0.46, 3.10],[0.30, 3.28],                // épaule
+      [0.205,3.45],[0.20, 3.70],[0.20, 4.05],                // col
+      [0.215,4.07],[0.215,4.16],[0.00, 4.16]                 // buvant
+    ];
+    pts.forEach(([x,y])=>p.push(new THREE.Vector2(x*scaleR, y)));
+    return p;
+  }
+
+  // Verre extérieur
+  const glassGeo = new THREE.LatheGeometry(profile(1), 96);
+  const glassMat = new THREE.MeshPhysicalMaterial({
+    color:0xeaf6fd, metalness:0, roughness:.045,
+    transmission:.96, thickness:.85, ior:1.45,
+    clearcoat:1, clearcoatRoughness:.06,
+    envMapIntensity:1.6, transparent:true, opacity:1,
+    side:THREE.DoubleSide
+  });
+  const glass = new THREE.Mesh(glassGeo, glassMat);
+  bottle.add(glass);
+
+  // Eau intérieure (légèrement plus petite, teinte glacier)
+  const waterGeo = new THREE.LatheGeometry(profile(.88).map(v=>new THREE.Vector2(v.x, Math.min(v.y, 3.0)*.97 + .06)), 96);
+  const waterMat = new THREE.MeshPhysicalMaterial({
+    color:0x9fd8f2, metalness:0, roughness:.12,
+    transmission:.92, thickness:1.4, ior:1.33,
+    envMapIntensity:1.1, transparent:true
+  });
+  bottle.add(new THREE.Mesh(waterGeo, waterMat));
+
+  // Capsule argent brossé
+  const cap = new THREE.Group();
+  const capMat = new THREE.MeshStandardMaterial({color:0xd8dee6, metalness:1, roughness:.28, envMapIntensity:1.4});
+  const capBody = new THREE.Mesh(new THREE.CylinderGeometry(.235,.235,.46,64), capMat);
+  capBody.position.y = 4.30;
+  const capTop = new THREE.Mesh(new THREE.CylinderGeometry(.235,.235,.03,64), new THREE.MeshStandardMaterial({color:0xeef2f6, metalness:1, roughness:.18, envMapIntensity:1.6}));
+  capTop.position.y = 4.545;
+  // fines stries de la capsule
+  const ridge = new THREE.Mesh(new THREE.TorusGeometry(.236,.006,8,64), capMat);
+  ridge.rotation.x = Math.PI/2; ridge.position.y = 4.14;
+  cap.add(capBody, capTop, ridge);
+  bottle.add(cap);
+
+  // Monogramme gravé : étiquette canvas minimale, fondue dans le verre
+  function labelTexture(){
+    const c = document.createElement('canvas'); c.width = 1024; c.height = 256;
+    const x = c.getContext('2d');
+    x.clearRect(0,0,1024,256);
+    x.fillStyle = 'rgba(245,247,250,.92)';
+    x.font = '300 92px Marcellus, serif';
+    x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.letterSpacing = '38px';
+    x.fillText('J L F', 512, 104);
+    x.font = '300 26px JetBrains Mono, monospace';
+    x.letterSpacing = '14px';
+    x.fillStyle = 'rgba(201,209,218,.75)';
+    x.fillText('P U R E   W A T E R', 512, 188);
+    const t = new THREE.CanvasTexture(c);
+    t.anisotropy = 8;
+    return t;
+  }
+  const labelMat = new THREE.MeshPhysicalMaterial({
+    map:labelTexture(), transparent:true, metalness:.1, roughness:.4,
+    envMapIntensity:.5, side:THREE.FrontSide, depthWrite:false
+  });
+  const label = new THREE.Mesh(new THREE.CylinderGeometry(.645,.645,.62,96,1,true,-0.75,1.5), labelMat);
+  label.position.y = 1.55;
+  bottle.add(label);
+
+  // Ombre douce au sol (sprite radial)
+  function shadowTexture(){
+    const c = document.createElement('canvas'); c.width=c.height=256;
+    const x=c.getContext('2d');
+    const g=x.createRadialGradient(128,128,10,128,128,120);
+    g.addColorStop(0,'rgba(0,0,0,.55)'); g.addColorStop(1,'rgba(0,0,0,0)');
+    x.fillStyle=g; x.fillRect(0,0,256,256);
+    return new THREE.CanvasTexture(c);
+  }
+  const shadow = new THREE.Mesh(new THREE.PlaneGeometry(3.6,3.6),
+    new THREE.MeshBasicMaterial({map:shadowTexture(), transparent:true, depthWrite:false}));
+  shadow.rotation.x = -Math.PI/2; shadow.position.y = -0.02;
+  bottle.add(shadow);
+
+  bottle.position.y = -2.05; // centre visuel ~ milieu du fût
+
+  /* ── Lumières d'appoint (spéculaires ponctuels) ── */
+  scene.add(new THREE.AmbientLight(0x223040, .5));
+  const key = new THREE.DirectionalLight(0xffffff, .9); key.position.set(-5,6,4); scene.add(key);
+  const rim = new THREE.DirectionalLight(0x9fd8f2, .8); rim.position.set(5,3,-4); scene.add(rim);
+
+  /* ── Bulles & brume ── */
+  function dotTexture(soft){
+    const c=document.createElement('canvas'); c.width=c.height=64;
+    const x=c.getContext('2d');
+    const g=x.createRadialGradient(32,32,2,32,32,30);
+    g.addColorStop(0,`rgba(220,242,255,${soft?'.5':'.95'})`);
+    g.addColorStop(.5,`rgba(170,220,245,${soft?'.18':'.35'})`);
+    g.addColorStop(1,'rgba(170,220,245,0)');
+    x.fillStyle=g; x.fillRect(0,0,64,64);
+    return new THREE.CanvasTexture(c);
+  }
+  const NB = 320, bGeo = new THREE.BufferGeometry();
+  const bPos = new Float32Array(NB*3), bSpd = new Float32Array(NB);
+  for(let i=0;i<NB;i++){
+    bPos[i*3]   = (Math.random()-.5)*14;
+    bPos[i*3+1] = Math.random()*10 - 4;
+    bPos[i*3+2] = (Math.random()-.5)*10 - 1;
+    bSpd[i] = .12 + Math.random()*.5;
+  }
+  bGeo.setAttribute('position', new THREE.BufferAttribute(bPos,3));
+  const bubbles = new THREE.Points(bGeo, new THREE.PointsMaterial({
+    map:dotTexture(false), size:.07, transparent:true, opacity:.7,
+    depthWrite:false, blending:THREE.AdditiveBlending, sizeAttenuation:true
+  }));
+  scene.add(bubbles);
+
+  // brume : 3 grands sprites doux qui dérivent
+  const mistMat = new THREE.SpriteMaterial({map:dotTexture(true), transparent:true, opacity:.16, depthWrite:false, blending:THREE.AdditiveBlending});
+  const mists = [];
+  for(let i=0;i<3;i++){
+    const s = new THREE.Sprite(mistMat.clone());
+    s.scale.setScalar(7+i*3);
+    s.position.set((i-1)*4, -1+i, -3-i*1.5);
+    scene.add(s); mists.push(s);
+  }
+
+  /* ── Caméra cinématique : keyframes pilotés par le scroll ──
+     t=0 hero · t=.25 floating (bouteille à droite) · t=.5 lumière (gauche, rasant)
+     · t=.72 close-up capsule · t=1 collection (recul centré)            */
+  const KEYS = [
+    { t:0.00, pos:[0.0, 0.3, 9.4], look:[0,-.1,0],  x:0.0  },
+    { t:0.22, pos:[2.6, 0.2, 7.6], look:[1.6,-.2,0],x:1.6  },
+    { t:0.48, pos:[-3.4,-0.6,6.2], look:[-1.7,0,0], x:-1.7 },
+    { t:0.70, pos:[1.2, 2.05,3.1], look:[.9,1.95,0],x:0.9  },
+    { t:0.88, pos:[0.0, 0.4,10.5], look:[0,-.2,0],  x:0.0  },
+    { t:1.00, pos:[0.0, 0.4,11.5], look:[0,-.2,0],  x:0.0  },
+  ];
+  const ease = u => u<.5 ? 2*u*u : 1-Math.pow(-2*u+2,2)/2;
+  function camAt(t){
+    let a=KEYS[0], b=KEYS[KEYS.length-1];
+    for(let i=0;i<KEYS.length-1;i++){
+      if(t>=KEYS[i].t && t<=KEYS[i+1].t){ a=KEYS[i]; b=KEYS[i+1]; break; }
+    }
+    const u = ease((t-a.t)/Math.max(1e-5,(b.t-a.t)));
+    const L = (p,q)=>p+(q-p)*u;
+    return {
+      pos:[L(a.pos[0],b.pos[0]), L(a.pos[1],b.pos[1]), L(a.pos[2],b.pos[2])],
+      look:[L(a.look[0],b.look[0]), L(a.look[1],b.look[1]), L(a.look[2],b.look[2])],
+      x:L(a.x,b.x)
+    };
+  }
+
+  /* ── Interaction ── */
+  let scrollT = 0, smoothT = 0, mx = 0, my = 0;
+  function readScroll(){
+    const max = document.documentElement.scrollHeight - innerHeight;
+    scrollT = max>0 ? Math.min(1, Math.max(0, scrollY/max)) : 0;
+  }
+  addEventListener('scroll', readScroll, {passive:true});
+  document.addEventListener('mousemove', e=>{
+    mx = (e.clientX/innerWidth - .5)*2;
+    my = (e.clientY/innerHeight - .5)*2;
+  });
+
+  const portrait = () => innerHeight > innerWidth;
+  const clock = new THREE.Clock();
+
+  (function tick(){
+    requestAnimationFrame(tick);
+    const t = clock.getElapsedTime();
+    smoothT += (scrollT - smoothT)*.06;
+    const k = camAt(smoothT);
+
+    // recul supplémentaire en portrait pour garder la bouteille entière
+    const zBoost = portrait() ? 2.6 : 0;
+    camera.position.set(
+      k.pos[0] + mx*.45,
+      k.pos[1] - my*.3,
+      k.pos[2] + zBoost
+    );
+    camera.lookAt(k.look[0], k.look[1], k.look[2]);
+
+    // bouteille : décalage latéral par section, rotation lente, flottaison
+    bottle.position.x += ((portrait()?0:k.x) - bottle.position.x)*.06;
+    bottle.position.y = -2.05 + Math.sin(t*.8)*.07;
+    bottle.rotation.y = t*.25 + smoothT*2.4;
+
+    // bulles ascendantes
+    const arr = bGeo.attributes.position.array;
+    for(let i=0;i<NB;i++){
+      arr[i*3+1] += bSpd[i]*.008;
+      arr[i*3]   += Math.sin(t*.7 + i)*.0012;
+      if(arr[i*3+1] > 7) arr[i*3+1] = -4.5;
+    }
+    bGeo.attributes.position.needsUpdate = true;
+
+    mists.forEach((m,i)=>{
+      m.position.x += Math.sin(t*.1 + i*2)*.004;
+      m.material.opacity = .12 + Math.sin(t*.3+i)*.04;
+    });
+
+    renderer.render(scene, camera);
+  })();
+
+  addEventListener('resize', ()=>{
+    camera.aspect = innerWidth/innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+  });
+})();
+
+/* ════ Curseur ════ */
+(function(){
+  const dot=document.getElementById('cur'), ring=document.getElementById('curR');
+  let x=innerWidth/2,y=innerHeight/2,rx=x,ry=y;
+  document.addEventListener('mousemove',e=>{x=e.clientX;y=e.clientY;dot.style.left=x+'px';dot.style.top=y+'px';});
+  (function l(){rx+=(x-rx)*.15;ry+=(y-ry)*.15;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(l);})();
+  document.addEventListener('mouseover',e=>{
+    ring.classList.toggle('big', !!e.target.closest('a,button,.p-card,.glass-card,.detail'));
+  });
+})();
+
+/* ════ Loader ════ */
+(function(){
+  const fill=document.getElementById('ldFill'), pct=document.getElementById('ldPct');
+  let p=0;
+  const iv=setInterval(()=>{
+    p+=Math.random()*8+4; if(p>=100)p=100;
+    fill.style.width=p+'%';
+    pct.textContent='PURE WATER · '+Math.floor(p)+'%';
+    if(p>=100){
+      clearInterval(iv);
+      setTimeout(()=>{
+        document.getElementById('loader').classList.add('done');
+        document.querySelectorAll('#hero .rv').forEach(el=>el.classList.add('in'));
+      },350);
+    }
+  },55);
+})();
+
+/* ════ Révélations au scroll + nav ════ */
+(function(){
+  const io = new IntersectionObserver(es=>{
+    es.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); });
+  },{threshold:.18});
+  document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+  const nav=document.getElementById('nav');
+  addEventListener('scroll',()=>nav.classList.toggle('scrolled', scrollY>40),{passive:true});
+})();
+</script>
+</body>
+</html>
